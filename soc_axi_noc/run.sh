@@ -1,9 +1,9 @@
 verilator \
-  -I/home/ravi_mishra/NOC_prj/FlooNoC/hw/include/floo_noc/axi/include/ \
-  -I/home/ravi_mishra/NOC_prj/FlooNoC/hw/include/floo_noc/axi/src/ \
-  -I/home/ravi_mishra/NOC_prj/FlooNoC/hw/include/floo_noc/common_cells/include/ \
-  -I/home/ravi_mishra/NOC_prj/FlooNoC/hw/include/floo_noc/common_cells/src/ \
-  -I/home/ravi_mishra/NOC_prj/FlooNoC/hw/include/ \
+  -I/home/ravi_mishra/FlooNOC_ravi/hw/include/floo_noc/axi/include/ \
+  -I/home/ravi_mishra/FlooNOC_ravi/hw/include/floo_noc/axi/src/ \
+  -I/home/ravi_mishra/FlooNOC_ravi/hw/include/floo_noc/common_cells/include/ \
+  -I/home/ravi_mishra/FlooNOC_ravi/hw/include/floo_noc/common_cells/src/ \
+  -I/home/ravi_mishra/FlooNOC_ravi/hw/include/ \
    --error-limit 0 \
   --lint-only --sv \
   -f rtl/filelist.lst \
