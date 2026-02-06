@@ -1,0 +1,166 @@
+name: soc_axi_noc
+description: "SoC AXI NoC for CPU/GPU/DMA with bridged AHB/APB peripherals"
+network_type: "axi"
+
+routing:
+  route_algo: "ID"
+  use_id_table: true
+
+# -----------------------
+# AXI protocol definition
+# -----------------------
+protocols:
+  - name: "axi_m"
+    protocol: "AXI4"
+    data_width: 128
+    addr_width: 48
+    id_width: 4
+    user_width: 1
+
+  - name: "axi_s"
+    protocol: "AXI4"
+    data_width: 128
+    addr_width: 48
+    id_width: 4
+    user_width: 1
+
+# -----------------------
+# Endpoints (Masters & Slaves)
+# -----------------------
+endpoints:
+
+  # -------- Masters --------
+  - name: "cpu"
+    mgr_port_protocol:
+      - "axi_m"
+
+  - name: "gpu"
+    mgr_port_protocol:
+      - "axi_m"
+
+  - name: "system_dma"
+    mgr_port_protocol:
+      - "axi_m"
+
+  - name: "ethernet"
+    mgr_port_protocol:
+      - "axi_m"
+
+  - name: "apb_ctrl"
+    mgr_port_protocol:
+      - "axi_m"
+
+  # -------- Slaves --------
+  - name: "ddr"
+    addr_range:
+      base: 0x8000_0000_0000
+      size: 0x0001_0000_0000
+    sbr_port_protocol:
+      - "axi_s"
+
+  - name: "l3_cache"
+    addr_range:
+      base: 0x7000_0000_0000
+      size: 0x0000_1000_0000
+    sbr_port_protocol:
+      - "axi_s"
+
+  - name: "pcie"
+    addr_range:
+      base: 0x6000_0000_0000
+      size: 0x0000_1000_0000
+    sbr_port_protocol:
+      - "axi_s"
+
+  - name: "npu"
+    addr_range:
+      base: 0x5000_0000_0000
+      size: 0x0000_1000_0000
+    sbr_port_protocol:
+      - "axi_s"
+
+  - name: "nand"
+    addr_range:
+      base: 0x4000_0000_0000
+      size: 0x0000_0100_0000
+    sbr_port_protocol:
+      - "axi_s"
+
+  - name: "sram"
+    addr_range:
+      base: 0x3000_0000_0000
+      size: 0x0000_0100_0000
+    sbr_port_protocol:
+      - "axi_s"
+
+  - name: "camera"
+    addr_range:
+      base: 0x2000_0000_0000
+      size: 0x0000_0100_0000
+    sbr_port_protocol:
+      - "axi_s"
+
+  - name: "network_ctrl"
+    addr_range:
+      base: 0x1000_0000_0000
+      size: 0x0000_0100_0000
+    sbr_port_protocol:
+      - "axi_s"
+
+  - name: "apb_group1"
+    addr_range:
+      start: 0x0000_0000_0000
+      end:   0x0000_0FFF_FFFF
+    sbr_port_protocol:
+      - "axi_s"
+
+  - name: "apb_group2"
+    addr_range:
+      start: 0x0000_1000_0000
+      end:   0x0000_1FFF_FFFF
+    sbr_port_protocol:
+      - "axi_s"
+
+# -----------------------
+# Router
+# -----------------------
+routers:
+  - name: "router"
+    degree: 16
+
+# -----------------------
+# Connections (Star Topology)
+# -----------------------
+connections:
+  - src: "cpu"
+    dst: "router"
+  - src: "gpu"
+    dst: "router"
+  - src: "system_dma"
+    dst: "router"
+  - src: "ethernet"
+    dst: "router"
+  - src: "apb_ctrl"
+    dst: "router"
+
+  - src: "router"
+    dst: "ddr"
+  - src: "router"
+    dst: "l3_cache"
+  - src: "router"
+    dst: "pcie"
+  - src: "router"
+    dst: "npu"
+  - src: "router"
+    dst: "nand"
+  - src: "router"
+    dst: "sram"
+  - src: "router"
+    dst: "camera"
+  - src: "router"
+    dst: "network_ctrl"
+  - src: "router"
+    dst: "apb_group1"
+  - src: "router"
+    dst: "apb_group2"
+
