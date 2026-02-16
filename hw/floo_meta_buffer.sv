@@ -272,35 +272,86 @@ module floo_meta_buffer #(
     assign available_atop_ids = ar_atop_reg_empty & aw_atop_reg_empty;
     assign no_atop_id_available = (available_atop_ids == '0);
 
-    stream_register #(
-      .T(buf_t)
-    ) i_ar_atop_regs [MaxAtomicTxns-1:0] (
-      .clk_i,
-      .rst_ni,
-      .clr_i      ( '0                ),
-      .testmode_i ( test_enable_i     ),
-      .valid_i    ( ar_atop_reg_push  ),
-      .ready_o    ( ar_atop_reg_empty ),
-      .data_i     ( ar_buf_i          ),
-      .valid_o    ( ar_atop_reg_full  ),
-      .ready_i    ( ar_atop_reg_pop   ),
-      .data_o     ( atop_r_buf        )
-    );
+//    stream_register #(
+//      .T(buf_t)
+//    ) i_ar_atop_regs [MaxAtomicTxns-1:0] (
+//      .clk_i,
+//      .rst_ni,
+//      .clr_i      ( '0                ),
+//      .testmode_i ( test_enable_i     ),
+//      .valid_i    ( ar_atop_reg_push  ),
+//      .ready_o    ( ar_atop_reg_empty ),
+//      .data_i     ( ar_buf_i          ),
+//      .valid_o    ( ar_atop_reg_full  ),
+//      .ready_i    ( ar_atop_reg_pop   ),
+//      .data_o     ( atop_r_buf        )
+//    );
+//
+//    stream_register #(
+//      .T(buf_t)
+//    ) i_aw_atop_regs [MaxAtomicTxns-1:0] (
+//      .clk_i,
+//      .rst_ni,
+//      .clr_i      ( '0                ),
+//      .testmode_i ( test_enable_i     ),
+//      .valid_i    ( aw_atop_reg_push  ),
+//      .ready_o    ( aw_atop_reg_empty ),
+//      .data_i     ( aw_buf_i          ),
+//      .valid_o    ( aw_atop_reg_full  ),
+//      .ready_i    ( aw_atop_reg_pop   ),
+//      .data_o     ( atop_b_buf        )
+//    );
 
-    stream_register #(
-      .T(buf_t)
-    ) i_aw_atop_regs [MaxAtomicTxns-1:0] (
-      .clk_i,
-      .rst_ni,
-      .clr_i      ( '0                ),
-      .testmode_i ( test_enable_i     ),
-      .valid_i    ( aw_atop_reg_push  ),
-      .ready_o    ( aw_atop_reg_empty ),
-      .data_i     ( aw_buf_i          ),
-      .valid_o    ( aw_atop_reg_full  ),
-      .ready_i    ( aw_atop_reg_pop   ),
-      .data_o     ( atop_b_buf        )
-    );
+// --------------------------------------------------
+// AR ATOP Registers
+// --------------------------------------------------
+
+for (genvar i = 0; i < MaxAtomicTxns; i++) begin : gen_ar_atop_regs
+  stream_register #(
+    .T(buf_t)
+  ) i_ar_atop_reg (
+    .clk_i,
+    .rst_ni,
+    .clr_i      ( 1'b0               ),
+    .testmode_i ( test_enable_i      ),
+
+    .valid_i    ( ar_atop_reg_push[i]  ),
+    .ready_o    ( ar_atop_reg_empty[i] ),
+
+    .data_i     ( ar_buf_i             ),
+
+    .valid_o    ( ar_atop_reg_full[i]  ),
+    .ready_i    ( ar_atop_reg_pop[i]   ),
+
+    .data_o     ( atop_r_buf[i]        )
+  );
+end
+
+
+// --------------------------------------------------
+// AW ATOP Registers
+// --------------------------------------------------
+
+for (genvar i = 0; i < MaxAtomicTxns; i++) begin : gen_aw_atop_regs
+  stream_register #(
+    .T(buf_t)
+  ) i_aw_atop_reg (
+    .clk_i,
+    .rst_ni,
+    .clr_i      ( 1'b0               ),
+    .testmode_i ( test_enable_i      ),
+
+    .valid_i    ( aw_atop_reg_push[i]  ),
+    .ready_o    ( aw_atop_reg_empty[i] ),
+
+    .data_i     ( aw_buf_i             ),
+
+    .valid_o    ( aw_atop_reg_full[i]  ),
+    .ready_i    ( aw_atop_reg_pop[i]   ),
+
+    .data_o     ( atop_w_buf[i]        )
+  );
+end
 
     typedef logic [cf_math_pkg::idx_width(MaxAtomicTxns)-1:0] atop_req_id_t;
     atop_req_id_t lzc_cnt_q, lzc_cnt_d;
