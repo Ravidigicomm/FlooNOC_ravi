@@ -100,3 +100,5 @@ reviewdog
 
 # Physical design repository
 pd
+*.swp
+*.swo
